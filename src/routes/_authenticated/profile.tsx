@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Camera,
@@ -98,7 +98,15 @@ function ProfilePage() {
     setFile(null);
   }
 
+  // Hydrate the form from the server exactly once per profile. `me` is a fresh
+  // object identity after every refetch -- and useInvalidateMeetMap() plus the
+  // global onAuthStateChange listener both trigger those -- so depending on it
+  // directly used to wipe whatever the user was halfway through typing.
+  const hydratedFor = useRef<string | null>(null);
+
   useEffect(() => {
+    if (!me || hydratedFor.current === me.id) return;
+    hydratedFor.current = me.id;
     reset(me);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me]);
@@ -107,13 +115,35 @@ function ProfilePage() {
 
   const storedAvatar = useStoredUrl(file ? null : avatar);
   const presetAvatar = !file && avatar?.startsWith("preset:") ? avatar.slice(7) : null;
-  const heroUrl = useMemo(
-    () => (file ? URL.createObjectURL(file) : storedAvatar),
-    [file, storedAvatar],
-  );
+
+  // Object URLs must be revoked or every photo pick leaks a blob for the
+  // lifetime of the document.
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file) {
+      setFilePreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setFilePreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  const heroUrl = filePreview ?? storedAvatar;
+
+  // Mirrors public.profile_is_complete(). Saving a profile that fails this
+  // flips registration_status to 'incomplete' via a database trigger, which
+  // silently removes the user from the map and revokes their ability to log
+  // meets. Previously the form let you do that with no warning at all.
+  const missingRequired = [
+    !name.trim() && "your name",
+    !(file || avatar?.trim()) && "a photo or emoji",
+    !area.trim() && "your neighbourhood",
+  ].filter((v): v is string => typeof v === "string");
+  const canSave = missingRequired.length === 0;
 
   async function save() {
-    if (!myId) return;
+    if (!myId || !canSave) return;
     setSaving(true);
     try {
       let avatarRef = avatar;
@@ -188,13 +218,20 @@ function ProfilePage() {
         <h1 className="font-display text-xl font-bold">Edit Profile</h1>
         <button
           onClick={save}
-          disabled={saving}
+          disabled={saving || !canSave}
+          title={canSave ? undefined : `Still need ${missingRequired.join(", ")}`}
           className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 font-display text-[15px] font-bold text-primary-foreground shadow-pop transition active:translate-y-0.5 active:scale-[0.98] disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           Save
         </button>
       </header>
+
+      {canSave ? null : (
+        <p className="mx-5 mb-1 rounded-2xl bg-accent/15 px-4 py-3 text-[13px] font-semibold text-accent-deep">
+          Add {missingRequired.join(", ")} to stay on the map.
+        </p>
+      )}
 
       <section className="px-5 pt-2">
         <div className="relative mx-auto h-36 w-36">

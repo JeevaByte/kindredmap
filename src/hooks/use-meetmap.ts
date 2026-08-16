@@ -88,16 +88,73 @@ export async function uploadImage(file: File, userId: string, folder: string) {
   return path;
 }
 
-const urlCache = new Map<string, string>();
+const SIGNED_URL_TTL_SECONDS = 3600;
+
+/**
+ * Treat a signed URL as stale slightly before it actually dies, so an <img>
+ * never starts loading a URL that expires mid-flight.
+ */
+const SIGNED_URL_REFRESH_MARGIN_MS = 5 * 60 * 1000;
+
+type CachedUrl = { url: string; expiresAt: number };
+
+/**
+ * Signed URLs are expensive to mint and are requested for the same avatar by
+ * many components at once, so they are cached module-wide. Entries carry an
+ * expiry: the URLs are only valid for an hour, and a cache that never expired
+ * meant every image silently broke once a session ran long enough.
+ */
+const urlCache = new Map<string, CachedUrl>();
+
+/** De-duplicates concurrent signing requests for the same object. */
+const inflight = new Map<string, Promise<string | null>>();
+
+function readCachedUrl(reference: string): string | null {
+  const hit = urlCache.get(reference);
+  if (!hit) return null;
+  if (hit.expiresAt <= Date.now()) {
+    urlCache.delete(reference);
+    return null;
+  }
+  return hit.url;
+}
+
+function signStoredUrl(reference: string): Promise<string | null> {
+  const pending = inflight.get(reference);
+  if (pending) return pending;
+
+  const request = supabase.storage
+    .from("meetmap")
+    .createSignedUrl(reference, SIGNED_URL_TTL_SECONDS)
+    .then(({ data }) => {
+      const signed = data?.signedUrl ?? null;
+      if (signed) {
+        urlCache.set(reference, {
+          url: signed,
+          expiresAt: Date.now() + SIGNED_URL_TTL_SECONDS * 1000 - SIGNED_URL_REFRESH_MARGIN_MS,
+        });
+      }
+      return signed;
+    })
+    .catch(() => null)
+    .finally(() => {
+      inflight.delete(reference);
+    });
+
+  inflight.set(reference, request);
+  return request;
+}
 
 /** Resolves a stored image reference: storage path, "preset:🦊", or null. */
 export function useStoredUrl(reference: string | null | undefined) {
   const [url, setUrl] = useState<string | null>(() =>
-    reference && urlCache.has(reference) ? (urlCache.get(reference) as string) : null,
+    reference ? readCachedUrl(reference) : null,
   );
 
   useEffect(() => {
     let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     if (!reference || reference.startsWith("preset:")) {
       setUrl(null);
       return;
@@ -106,21 +163,36 @@ export function useStoredUrl(reference: string | null | undefined) {
       setUrl(reference);
       return;
     }
-    const cached = urlCache.get(reference);
-    if (cached) {
-      setUrl(cached);
-      return;
+
+    // Long-lived screens (the map, the network orbit) can outlive a signed
+    // URL, and the effect will not re-run because `reference` never changes.
+    // Re-sign on a timer so those images keep working.
+    function scheduleRefresh() {
+      const hit = urlCache.get(reference as string);
+      if (!hit) return;
+      timer = setTimeout(resolve, Math.max(hit.expiresAt - Date.now(), 0));
     }
-    supabase.storage
-      .from("meetmap")
-      .createSignedUrl(reference, 3600)
-      .then(({ data }) => {
-        if (!active || !data?.signedUrl) return;
-        urlCache.set(reference, data.signedUrl);
-        setUrl(data.signedUrl);
+
+    function resolve() {
+      if (!active) return;
+      const cached = readCachedUrl(reference as string);
+      if (cached) {
+        setUrl(cached);
+        scheduleRefresh();
+        return;
+      }
+      void signStoredUrl(reference as string).then((signed) => {
+        if (!active) return;
+        setUrl(signed);
+        scheduleRefresh();
       });
+    }
+
+    resolve();
+
     return () => {
       active = false;
+      if (timer) clearTimeout(timer);
     };
   }, [reference]);
 
