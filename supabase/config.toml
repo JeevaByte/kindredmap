@@ -1,5 +1,26 @@
 project_id = "nfayxlseamuhppryxrbm"
 
+[auth.email]
+enable_signup = true
+# The sign-in screen (src/routes/auth.tsx) is a 6-box OTP field, so the emails
+# must carry a code. Confirmations are done by typing {{ .Token }}, never by
+# clicking {{ .ConfirmationURL }}.
+enable_confirmations = true
+otp_length = 6
+otp_expiry = 3600
+
+# New accounts. signInWithOtp({ shouldCreateUser: true }) sends THIS template to
+# a first-time user, not the magic link one -- the usual reason a signup still
+# arrives as a clickable link after the magic link template has been fixed.
+[auth.email.template.confirmation]
+subject = "Your Meet Map code"
+content_path = "./supabase/templates/confirmation.html"
+
+# Existing accounts signing in again.
+[auth.email.template.magic_link]
+subject = "Your Meet Map sign-in code"
+content_path = "./supabase/templates/magic_link.html"
+
 # The Send Email hook is invoked by GoTrue, which authenticates with a
 # standardwebhooks signature rather than a Supabase JWT, so JWT verification
 # must be off or every call is rejected before the function runs.
@@ -7,12 +28,15 @@ project_id = "nfayxlseamuhppryxrbm"
 enabled = true
 verify_jwt = false
 
-# Replaces Supabase's built-in auth email delivery so the OTP screen in
-# src/routes/auth.tsx receives a 6-digit code instead of a magic link.
+# OPTIONAL, and off by default. Enabling this REPLACES Supabase's built-in email
+# sending entirely -- if the function errors, no auth email is delivered and
+# nobody can sign in. The templates above already deliver a 6-digit code without
+# it. Turn this on only when you want your own domain and deliverability, and
+# only after testing with `supabase functions serve`.
 #
 # For local development (`supabase start`) point this at the local runtime:
 #   uri = "http://host.docker.internal:54321/functions/v1/send-email"
 [auth.hook.send_email]
-enabled = true
+enabled = false
 uri = "https://nfayxlseamuhppryxrbm.supabase.co/functions/v1/send-email"
 secrets = "env(SEND_EMAIL_HOOK_SECRET)"

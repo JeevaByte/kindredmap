@@ -61,7 +61,14 @@ function AuthPage() {
     if (cooldown > 0) return;
     setBusy(true);
     try {
-      // No emailRedirectTo and no link options → the provider issues a numeric OTP.
+      // Whether the member receives a 6-digit code or a clickable link is NOT
+      // decided here -- Supabase always generates both a token and a
+      // confirmation URL. It is decided by the email templates, which must
+      // render {{ .Token }}. See supabase/templates/ and supabase/config.toml.
+      //
+      // Note there are two templates in play: a brand new account gets
+      // "confirmation", an existing one gets "magic_link". Both must use the
+      // token or half of your members still receive a link they cannot type.
       const { error } =
         method === "email"
           ? await supabase.auth.signInWithOtp({

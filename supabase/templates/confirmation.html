@@ -1,0 +1,112 @@
+<!doctype html>
+<!--
+  Confirm signup template — sent to BRAND NEW accounts when signInWithOtp() is
+  called with shouldCreateUser: true (src/routes/auth.tsx:69).
+
+  This is the one most people miss. A first-time signup never touches the Magic
+  Link template, so fixing only that one leaves every new member receiving a
+  clickable link they cannot use on the 6-box OTP screen.
+
+  Renders the 6-digit Token. Do not reintroduce the confirmation-URL variable
+  anywhere in this file, not even inside a comment: Go templates substitute
+  inside HTML comments too, which would embed a working magic link in the raw
+  email source.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Welcome to the Circle</title>
+  </head>
+  <body style="margin: 0; padding: 0; background: #fdf8f3">
+    <!-- Preheader: shows in the inbox preview line next to the subject. -->
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0">
+      Your Meet Map code is {{ .Token }}
+    </div>
+
+    <div
+      style="
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif;
+      "
+    >
+      <div
+        style="
+          background: #ffffff;
+          border-radius: 28px;
+          padding: 40px 32px;
+          box-shadow: 0 8px 30px rgba(31, 41, 51, 0.07);
+          text-align: center;
+        "
+      >
+        <div
+          style="
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #ff6b6b;
+          "
+        >
+          Meet Map
+        </div>
+
+        <h1 style="margin: 14px 0 8px; font-size: 26px; line-height: 1.25; color: #1f2933">
+          Welcome to the Circle
+        </h1>
+
+        <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: #6b7280">
+          Enter this code to confirm your email and finish signing up.
+        </p>
+
+        <div
+          style="
+            display: inline-block;
+            padding: 18px 26px;
+            background: #fff5f5;
+            border-radius: 16px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 0.28em;
+            text-indent: 0.28em;
+            color: #1f2933;
+          "
+        >
+          {{ .Token }}
+        </div>
+
+        <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #9aa5b1">
+          Expires in about an hour, and only works once.
+        </p>
+      </div>
+
+      <p
+        style="
+          margin: 24px 8px 0;
+          font-size: 13px;
+          line-height: 1.6;
+          color: #9aa5b1;
+          text-align: center;
+        "
+      >
+        Didn't ask for this? You can safely ignore this email — nobody can sign in without the code.
+      </p>
+
+      <p
+        style="
+          margin: 12px 8px 0;
+          font-size: 13px;
+          line-height: 1.6;
+          color: #c2c9d1;
+          text-align: center;
+        "
+      >
+        The little map of founders you actually know.
+      </p>
+    </div>
+  </body>
+</html>
