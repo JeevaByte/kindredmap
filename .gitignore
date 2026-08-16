@@ -20,6 +20,11 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Supabase edge function secrets.
+# The root .env holds only publishable (anon) keys, which ship in the browser
+# bundle anyway. These hold a Resend API key and the auth hook signing secret.
+supabase/functions/**/.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

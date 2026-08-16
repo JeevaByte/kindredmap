@@ -1,1 +1,18 @@
 project_id = "nfayxlseamuhppryxrbm"
+
+# The Send Email hook is invoked by GoTrue, which authenticates with a
+# standardwebhooks signature rather than a Supabase JWT, so JWT verification
+# must be off or every call is rejected before the function runs.
+[functions.send-email]
+enabled = true
+verify_jwt = false
+
+# Replaces Supabase's built-in auth email delivery so the OTP screen in
+# src/routes/auth.tsx receives a 6-digit code instead of a magic link.
+#
+# For local development (`supabase start`) point this at the local runtime:
+#   uri = "http://host.docker.internal:54321/functions/v1/send-email"
+[auth.hook.send_email]
+enabled = true
+uri = "https://nfayxlseamuhppryxrbm.supabase.co/functions/v1/send-email"
+secrets = "env(SEND_EMAIL_HOOK_SECRET)"
