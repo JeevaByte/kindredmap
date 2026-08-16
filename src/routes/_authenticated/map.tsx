@@ -18,7 +18,6 @@ import {
 import {
   OUTSIDE_CHENNAI,
   buildingLine,
-
   matchesMyBuild,
   otherUserId,
   type ConnectionType,
@@ -99,7 +98,6 @@ function MapPage() {
     .filter((m) => m.id !== myId)
     .filter((m) => m.name.toLowerCase().includes(query.trim().toLowerCase()));
 
-
   return (
     <main className="min-h-screen map-dots pb-40">
       <header className="px-5 pt-8">
@@ -167,10 +165,6 @@ function MapPage() {
         </section>
       ) : null}
 
-
-
-
-
       {worldView ? (
         <section className="mt-6 grid gap-5 px-5">
           <button
@@ -212,8 +206,7 @@ function MapPage() {
                 const mine = list.some((m) => m.id === myId);
                 const tone = ["disc-coral", "disc-mustard", "disc-teal"][i % 3] as string;
                 const size = Math.min(196, 132 + list.length * 8);
-                const align =
-                  i % 3 === 0 ? "self-start" : i % 3 === 1 ? "self-center" : "self-end";
+                const align = i % 3 === 0 ? "self-start" : i % 3 === 1 ? "self-center" : "self-end";
                 return (
                   <div key={area} className={`${align} flex flex-col items-center`}>
                     {i > 0 ? (
@@ -260,7 +253,6 @@ function MapPage() {
               })}
             </div>
           )}
-
         </section>
       )}
 
@@ -299,7 +291,6 @@ function MapPage() {
           })}
         </div>
       </Sheet>
-
 
       <FounderSheet
         open={!!picked && !logType}

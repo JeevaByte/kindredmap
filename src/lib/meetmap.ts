@@ -97,7 +97,9 @@ export function nudgeCopy(type: ConnectionType, name: string) {
   }
 }
 
-export function buildingLine(p: Pick<Profile, "building_what" | "building_for" | "building_so" | "building_line">) {
+export function buildingLine(
+  p: Pick<Profile, "building_what" | "building_for" | "building_so" | "building_line">,
+) {
   if (p.building_line) return p.building_line;
   if (!p.building_what) return "";
   return `Building ${p.building_what} for ${p.building_for ?? "…"} so they can ${p.building_so ?? "…"}`;
@@ -145,7 +147,10 @@ export function daysSince(iso: string) {
  */
 export function isProfileComplete(
   p:
-    | (Pick<Profile, "name" | "avatar_url" | "building_what" | "building_for" | "building_so" | "area"> & {
+    | (Pick<
+        Profile,
+        "name" | "avatar_url" | "building_what" | "building_for" | "building_so" | "area"
+      > & {
         registration_status?: Profile["registration_status"];
       })
     | null

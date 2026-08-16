@@ -83,7 +83,9 @@ export function FounderSheet({ profile, open, onClose, onPick, existing }: Props
                   }`}
                 >
                   <Icon className="h-5 w-5" />
-                  <span>{logged ? (logged.status === "confirmed" ? "Confirmed" : "Pending") : label}</span>
+                  <span>
+                    {logged ? (logged.status === "confirmed" ? "Confirmed" : "Pending") : label}
+                  </span>
                 </button>
               );
             })}

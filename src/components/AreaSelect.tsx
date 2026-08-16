@@ -24,7 +24,13 @@ type Props = {
 };
 
 /** Searchable locality dropdown. Values are stored exactly as listed. */
-export function AreaSelect({ value, onChange, placeholder = "Pick your area", className, icon }: Props) {
+export function AreaSelect({
+  value,
+  onChange,
+  placeholder = "Pick your area",
+  className,
+  icon,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -45,10 +51,7 @@ export function AreaSelect({ value, onChange, placeholder = "Pick your area", cl
           {icon ?? <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />}
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        className="w-[min(22rem,calc(100vw-3rem))] rounded-2xl p-0"
-      >
+      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-3rem))] rounded-2xl p-0">
         <Command>
           <CommandInput placeholder="Search areas…" />
           <CommandList className="max-h-64">

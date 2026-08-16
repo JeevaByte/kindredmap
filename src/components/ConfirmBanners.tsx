@@ -20,7 +20,9 @@ function Row({ connection, from }: { connection: Connection; from: Profile }) {
       return;
     }
     invalidate();
-    toast.success("Confirmed!", { description: `You and ${from.name} are now on the map together.` });
+    toast.success("Confirmed!", {
+      description: `You and ${from.name} are now on the map together.`,
+    });
   }
 
   return (

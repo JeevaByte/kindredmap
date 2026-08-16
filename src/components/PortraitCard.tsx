@@ -31,7 +31,9 @@ export function PortraitCard({ name, avatar, line, area, file }: Props) {
           <h2 className="font-display text-3xl font-bold leading-tight text-card">{name}</h2>
           {line ? <p className="mt-0.5 text-[15px] leading-5 text-card/85">{line}</p> : null}
           {area ? (
-            <p className="mt-1 text-xs font-extrabold uppercase tracking-widest text-card/70">{area}</p>
+            <p className="mt-1 text-xs font-extrabold uppercase tracking-widest text-card/70">
+              {area}
+            </p>
           ) : null}
         </div>
       </div>

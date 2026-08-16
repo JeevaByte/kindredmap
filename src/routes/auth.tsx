@@ -38,7 +38,6 @@ function AuthPage() {
   const destination = email.trim();
   const validDestination = /\S+@\S+\.\S+/.test(destination);
 
-
   useEffect(() => {
     if (cooldown <= 0) return;
     const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
@@ -186,7 +185,6 @@ function AuthPage() {
             />
           )}
         </div>
-
 
         <button
           disabled={busy || (otpSent ? code.trim().length < 6 : !validDestination)}

@@ -22,7 +22,11 @@ export function useMyProfile() {
     queryKey: ["profile", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId!).maybeSingle();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId!)
+        .maybeSingle();
       if (error) throw error;
       return data as Profile | null;
     },

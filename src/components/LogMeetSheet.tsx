@@ -49,7 +49,9 @@ export function LogMeetSheet({ open, onClose, target, type, myId }: Props) {
       onClose();
       toast.success("Sent!", { description: `We'll let you know when ${target.name} confirms.` });
     } catch (e) {
-      toast.error("Couldn't send that", { description: e instanceof Error ? e.message : "Try again" });
+      toast.error("Couldn't send that", {
+        description: e instanceof Error ? e.message : "Try again",
+      });
     } finally {
       setSaving(false);
     }
@@ -65,7 +67,9 @@ export function LogMeetSheet({ open, onClose, target, type, myId }: Props) {
             {CONNECTION_LABEL[type]} — {target.name}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isKnow ? "Add a note if you want. Totally skippable." : "Add proof of the vibes. Totally skippable."}
+            {isKnow
+              ? "Add a note if you want. Totally skippable."
+              : "Add proof of the vibes. Totally skippable."}
           </p>
 
           {!isKnow ? (
@@ -118,7 +122,6 @@ export function LogMeetSheet({ open, onClose, target, type, myId }: Props) {
             onChange={(e) => setDate(e.target.value)}
             className="mt-1 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-[15px] outline-none focus:border-primary"
           />
-
 
           <button
             disabled={saving}

@@ -79,9 +79,13 @@ function MeetDetail({ connection, who }: { connection: Connection; who: Profile 
         </div>
       </div>
       {connection.note ? (
-        <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-[15px] italic">“{connection.note}”</p>
+        <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-[15px] italic">
+          “{connection.note}”
+        </p>
       ) : null}
-      {photo ? <img src={photo} alt="Meet photo" className="mt-3 w-full rounded-2xl object-cover" /> : null}
+      {photo ? (
+        <img src={photo} alt="Meet photo" className="mt-3 w-full rounded-2xl object-cover" />
+      ) : null}
       {connection.fun_fact ? (
         <p className="mt-3 rounded-2xl border border-dashed border-accent/50 px-4 py-3 text-[15px]">
           <span className="font-bold text-accent-deep">Fun fact · </span>
@@ -132,7 +136,9 @@ function NetworkPage() {
     if (!myId) return;
     const channel = supabase
       .channel("network-connections")
-      .on("postgres_changes", { event: "*", schema: "public", table: "connections" }, () => invalidate())
+      .on("postgres_changes", { event: "*", schema: "public", table: "connections" }, () =>
+        invalidate(),
+      )
       .subscribe();
     const onFocus = () => void refetch();
     window.addEventListener("focus", onFocus);
@@ -175,7 +181,9 @@ function NetworkPage() {
   return (
     <main className="min-h-screen map-dots pb-36">
       <header className="px-5 pt-8">
-        <p className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">My network</p>
+        <p className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
+          My network
+        </p>
         <h1 className="font-display text-4xl leading-tight">
           {nodes.length} thread{nodes.length === 1 ? "" : "s"}
         </h1>
@@ -251,7 +259,9 @@ function NetworkPage() {
                   style={{ left: x + (board - SIZE) / 2, top: y + (board - SIZE) / 2 }}
                 >
                   <AvatarBubble name={person.name} avatar={person.avatar_url} size={48} />
-                  <span className="absolute -bottom-1 -right-1 text-sm">{CONNECTION_EMOJI[c.type]}</span>
+                  <span className="absolute -bottom-1 -right-1 text-sm">
+                    {CONNECTION_EMOJI[c.type]}
+                  </span>
                 </button>
               ))}
             </div>

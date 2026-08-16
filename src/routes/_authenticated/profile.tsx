@@ -1,7 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Camera, ChevronDown, Link2, Loader2, LogOut, MapPin, Rocket, Trash2, Upload } from "lucide-react";
+import {
+  Camera,
+  ChevronDown,
+  Link2,
+  Loader2,
+  LogOut,
+  MapPin,
+  Rocket,
+  Trash2,
+  Upload,
+} from "lucide-react";
 
 import { AreaSelect } from "@/components/AreaSelect";
 import { AvatarBubble } from "@/components/AvatarBubble";
@@ -38,7 +48,10 @@ export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
       { title: "Edit Profile — Meet Map" },
-      { name: "description", content: "Update your photo, your pitch, your stage and your island." },
+      {
+        name: "description",
+        content: "Update your photo, your pitch, your stage and your island.",
+      },
       { property: "og:title", content: "Edit Profile — Meet Map" },
       {
         property: "og:description",
@@ -94,7 +107,10 @@ function ProfilePage() {
 
   const storedAvatar = useStoredUrl(file ? null : avatar);
   const presetAvatar = !file && avatar?.startsWith("preset:") ? avatar.slice(7) : null;
-  const heroUrl = useMemo(() => (file ? URL.createObjectURL(file) : storedAvatar), [file, storedAvatar]);
+  const heroUrl = useMemo(
+    () => (file ? URL.createObjectURL(file) : storedAvatar),
+    [file, storedAvatar],
+  );
 
   async function save() {
     if (!myId) return;
@@ -152,7 +168,10 @@ function ProfilePage() {
       "Deactivate your account? You'll be hidden from the map until you sign back in and finish your profile.",
     );
     if (!ok) return;
-    const { error } = await supabase.from("profiles").update({ avatar_url: null, area: null }).eq("id", myId);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: null, area: null })
+      .eq("id", myId);
     if (error) {
       toast.error("Couldn't deactivate", { description: error.message });
       return;
@@ -181,7 +200,11 @@ function ProfilePage() {
         <div className="relative mx-auto h-36 w-36">
           <div className="h-36 w-36 overflow-hidden rounded-full border-[5px] border-card bg-surface-2 shadow-pop">
             {heroUrl ? (
-              <img src={heroUrl} alt={name || "Your photo"} className="h-full w-full object-cover" />
+              <img
+                src={heroUrl}
+                alt={name || "Your photo"}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-full w-full items-center justify-center font-display text-5xl text-accent-deep">
                 {presetAvatar ?? initials(name || "?")}
@@ -214,7 +237,9 @@ function ProfilePage() {
                 setFile(null);
               }}
               className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-2xl transition active:scale-95 ${avatarTone(i)} ${
-                !file && avatar === `preset:${emoji}` ? "ring-2 ring-primary ring-offset-2 ring-offset-surface" : ""
+                !file && avatar === `preset:${emoji}`
+                  ? "ring-2 ring-primary ring-offset-2 ring-offset-surface"
+                  : ""
               }`}
               aria-label={`Use ${emoji} avatar`}
             >
@@ -335,7 +360,11 @@ function ProfilePage() {
                 const who = members.find((m) => myId && m.id === otherUserId(c, myId));
                 return (
                   <div key={c.id} className="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
-                    <AvatarBubble name={who?.name ?? "?"} avatar={who?.avatar_url ?? null} size={36} />
+                    <AvatarBubble
+                      name={who?.name ?? "?"}
+                      avatar={who?.avatar_url ?? null}
+                      size={36}
+                    />
                     <span className="text-sm font-bold">
                       {who?.name ?? "Someone"}{" "}
                       <span className="font-normal text-muted-foreground">
