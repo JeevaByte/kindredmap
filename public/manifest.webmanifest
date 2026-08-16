@@ -1,0 +1,13 @@
+{
+  "name": "Meet Map — PMF Circle",
+  "short_name": "Meet Map",
+  "description": "A private connection map for PMF Circle founders.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffaf3",
+  "theme_color": "#ff6b6b",
+  "icons": [
+    { "src": "/app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
